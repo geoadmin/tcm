@@ -1,25 +1,33 @@
-from flask import Flask, render_template
-from services import get_tile_clusters
+from flask import Flask, render_template, request
+from services import get_tile_clusters, get_images, get_master_instances
 
 app = Flask(__name__)
 app.config.from_object('config')
 
-@app.route("/")
+@app.context_processor
+def inject_user():
+    username = request.headers.get('REMOTE_USER')
+    if username is None:
+        username = "Anyonmous"
+
+    return dict(username=username)
+
+@app.route('/')
 def index():
-    #as_conn = get_autoscale_connection()
-    #groups = as_conn.get_all_groups()
+    context = { 'title': 'Index' }
+    if request.is_xhr:
+        context['clusters'] = get_tile_clusters()
+        return render_template('index.html', **context)
 
-    #launch_config_names = [group.launch_config_name for group in groups]
-    #kwargs = {'names': launch_config_names}
-    #launch_configs = as_conn.get_all_launch_configurations(**kwargs)
+    return render_template('loader.html', **context)
 
-    #elb_names = [elb for elb in group.load_balancers for group in groups]
-    
-    #kwargs = {'load_balancer_names': elb_names}
-    #elb_conn = get_elb_connection()
-    #elbs = elb_conn.get_all_load_balancers(**kwargs)
+@app.route('/images')
+def images():
+    context = { 'title': 'Images' }
+    if request.is_xhr:
+        context['images'] = get_images()
+        context['instances'] = get_master_instances()
+        return render_template('images.html', **context)
 
-    clusters = get_tile_clusters()
-    print clusters
+    return render_template('loader.html', **context)
 
-    return render_template('index.html', clusters=clusters)

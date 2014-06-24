@@ -36,12 +36,11 @@ def get_elb_connection(region_name='eu-west-1'):
         aws_secret_access_key=config.AWS_SECERET_ACCESS_KEY
     )
 
-def get_tile_clusters():
+def get_tile_clusters(**filter):
     as_conn = get_autoscale_connection()
 
     clusters = []
-
-    for group in as_conn.get_all_groups():
+    for group in as_conn.get_all_groups(**filter):
         cluster = {'group': group}
         kwargs = {'names': [group.launch_config_name]}
         launch_configs = as_conn.get_all_launch_configurations(**kwargs)
@@ -54,3 +53,16 @@ def get_tile_clusters():
         clusters.append(cluster)
         
     return clusters
+
+def get_images():
+    conn = get_ec2_connection()
+    images = conn.get_all_images(owners=['self'])
+    return images
+
+def get_master_instances():
+    conn = get_ec2_connection()
+    filters = {'tag:tcm': 'master'}
+    return conn.get_only_instances(filters=filters)
+
+
+

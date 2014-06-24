@@ -1,5 +1,5 @@
 import config
-from boto import ec2
+from boto import ec2, cloudformation
 from boto.ec2 import autoscale, elb
 
 def get_ec2_connection(region_name='eu-west-1'):
@@ -12,6 +12,15 @@ def get_ec2_connection(region_name='eu-west-1'):
         aws_secret_access_key=config.AWS_SECERET_ACCESS_KEY
     )
 
+def get_cloudformation_connection(region_name='eu-west-1'):
+    """
+    Return cloudformation connection to region
+    """
+    return cloudformation.connect_to_region(
+        region_name,
+        aws_access_key_id=config.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=config.AWS_SECERET_ACCESS_KEY
+    )
 
 def get_autoscale_connection(region_name='eu-west-1'):
     """
@@ -37,20 +46,28 @@ def get_elb_connection(region_name='eu-west-1'):
     )
 
 def get_tile_clusters(**filter):
+    ec2_conn = get_ec2_connection()
+    cf_conn = get_cloudformation_connection()
+    elb_conn = get_elb_connection()
     as_conn = get_autoscale_connection()
 
     clusters = []
-    for group in as_conn.get_all_groups(**filter):
-        cluster = {'group': group}
-        kwargs = {'names': [group.launch_config_name]}
-        launch_configs = as_conn.get_all_launch_configurations(**kwargs)
-        cluster['launch_config'] = launch_configs[0]
+    for stack in cf_conn.describe_stacks():
+        if stack.stack_status not in ('ROLLBACK_COMPLETE'):
+            cluster = {'stack': stack}
+            for resource in stack.list_resources():
+                if resource.resource_type == 'AWS::ElasticLoadBalancing::LoadBalancer':
+                    cluster['elb'] = elb_conn.get_all_load_balancers(load_balancer_names=[resource.physical_resource_id])[0]
+                elif resource.resource_type == 'AWS::AutoScaling::LaunchConfiguration':
+                    kwargs = {'names': [resource.physical_resource_id]}
+                    cluster['launch_config'] = as_conn.get_all_launch_configurations(**kwargs)[0]
+                elif  resource.resource_type == 'AWS::AutoScaling::AutoScalingGroup':
+                    cluster['group'] = as_conn.get_all_groups(names=[resource.physical_resource_id])[0]
 
-        elb_conn = get_elb_connection()
-        kwargs = {'load_balancer_names': [elb for elb in group.load_balancers]}
-        cluster['elbs'] = elb_conn.get_all_load_balancers(**kwargs)
+            instance_ids = [i.instance_id for i in cluster['group'].instances]
+            cluster['instances'] = ec2_conn.get_only_instances(instance_ids=instance_ids)
 
-        clusters.append(cluster)
+            clusters.append(cluster)
         
     return clusters
 
@@ -63,6 +80,5 @@ def get_master_instances():
     conn = get_ec2_connection()
     filters = {'tag:tcm': 'master'}
     return conn.get_only_instances(filters=filters)
-
 
 

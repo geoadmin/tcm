@@ -19,9 +19,11 @@
             <div class="panel-body">
                 <dl class="dl-horizontal">
             <dt>URL</dt><dd>http://{{ cluster.elb.dns_name|lower }}</dd>
-             <dt>Capacity</dt><dd>{{ cluster.group.desired_capacity }}</dd>
-            <dt>State</dt><dd>{{ cluster.stack.stack_status }}</dd>
-            <dt>Item 3</dt><dd>is for item 3</dd>
+            <dt>Capacity</dt><dd>{{ cluster.group.desired_capacity }}</dd>
+            <dt>AMI</dt><dd>{{ cluster.launch_config.image_id }}</dd>
+            <dt>Instance Type</dt><dd>{{ cluster.launch_config.instance_type }}</dd>
+            <dt>Stack State</dt><dd>{{ cluster.stack.stack_status|highlight_with_label }}</dd>
+            <dt>ELB State</dt><dd></dd>
     </dl>
     </div>
     </div>
@@ -44,6 +46,7 @@
                                             <th>Instance</th>
                                             <th>AMI</th>
                                             <th>Instance Type</th>
+                                            <th>IP Address</th>
                                             <th>State<th>
                                         </tr>
                                     </thead>
@@ -54,7 +57,8 @@
                                             <td>{{ instance.id }}</td>
                                             <td>{{ instance.image_id }}</td>
                                             <td>{{ instance.instance_type }}</td>
-                                            <td>{{ instance.state }}</td>
+                                            <td>{{ instance.private_ip_address }}</td>
+                                            <td>{{ instance.state|highlight_with_label }}</td>
                                     </tr>
                                     {% endfor %}
                                     </tbody>

@@ -10,6 +10,7 @@
             <thead>
                 <tr>
                     <th>AMI</th>
+                    <th>Name</th>
                     <th>Description</th>
                     <th>Creator</th>
                     <th>State</th>
@@ -19,8 +20,9 @@
                 {% for image in images %}
                 <tr>
                     <td>{{ image.id }}</td>
+                    <td>{{ image.name }}</td>
                     <td>{{ image.description }}</td>
-                    <td></td>
+                    <td>{{ image.tags.creator }}</td>
                     <td>{{ image.state|highlight_with_label }}</td>
                 </tr>
                 {% endfor %}
@@ -41,6 +43,7 @@
                     <th>Instance</th>
                     <th>Name</th>
                     <th>State</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,6 +52,40 @@
                     <td>{{ instance.id }}</td>
                     <td>{{ instance.tags.Name }}</td>
                     <td>{{ instance.state|highlight_with_label }}</td>
+                    <td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#{{ instance.id }}">Create Image</button></td>
+
+
+
+                            <div class="modal fade" id="{{ instance.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                                        </div>
+                                            <form id="form-{{ instance.id }}">
+                        <input type='hidden' name='id' value='{{ instance.id }}'/>
+            <fieldset>
+                 <div class="modal-body">
+                     <ul class="nav nav-list">
+                <li class="nav-header">Description</li>
+                <li><input class="input-xlarge" value="" type="text" name="description"></li>
+                </ul> 
+                </div>
+            </fieldset>
+            </form> 
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Abort</button>
+                                            <button type="button" class="btn btn-primary" onClick="createImage('{{ instance.id }}');">Create Image</button>
+                                        </div>
+                                    </div>
+                                    <!-- /.modal-content -->
+                                </div>
+                                <!-- /.modal-dialog -->
+                            </div>
+                            <!-- /.modal -->
+
+
                 </tr>
                 {% endfor %}
             </tbody>
@@ -59,3 +96,30 @@
 <!-- /.panel-body -->
 </div>
 </div>
+
+<script>
+
+var createImage = function($instanceId) {
+  
+ $.ajax({
+            type: "POST",
+        url: "/create-image",
+        data: $('#form-' + $instanceId).serialize(),
+        success: function($result){
+                
+            },
+        error: function($result){
+            alert($result.responseText);
+            }
+              });
+ 
+
+    loadPage();
+    $('#' + $instanceId).modal('hide');
+
+}
+
+</script>
+
+
+

@@ -1,5 +1,8 @@
-from flask import Flask, render_template, request, Markup
-from services import get_tile_clusters, get_images, get_master_instances
+import time
+
+from flask import Flask, render_template, request, Markup, make_response
+from services import get_tile_clusters, get_images, get_master_instances, get_ec2_connection
+from boto.exception import EC2ResponseError
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -53,4 +56,27 @@ def images():
         return render_template('images.html', **context)
 
     return render_template('loader.html', **context)
+
+@app.route('/create-image', methods=['POST'])
+def create_image():
+    id = request.form['id']
+    description = request.form['description']
+    user = inject_user()['username']
+
+    conn = get_ec2_connection()
+
+    instances = conn.get_only_instances(instance_ids=[id])
+    instance = instances[0]
+
+    name = "%s_%s" % (instance.tags['Name'], time.strftime("%Y-%m-%d_%H-%M-%S"))
+    
+    try:
+        ami_id = instance.create_image(name, description)
+    except EC2ResponseError, e:
+        return make_response(e.error_message, 500) 
+    
+    ami = conn.get_image(ami_id)
+    ami.add_tag('creator', user)
+
+    return "Ok"
 

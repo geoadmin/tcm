@@ -76,7 +76,7 @@
             </form> 
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-default" data-dismiss="modal">Abort</button>
-                                            <button type="button" class="btn btn-primary" onClick="createImage('{{ instance.id }}');">Create Image</button>
+                                            <button type="button" id='create-image' class="btn btn-primary" data-loading-text="Loading..." onClick="$(this).button('loading'); createImage('{{ instance.id }}');">Create Image</button>
                                         </div>
                                     </div>
                                     <!-- /.modal-content -->
@@ -105,17 +105,17 @@ var createImage = function($instanceId) {
             type: "POST",
         url: "/create-image",
         data: $('#form-' + $instanceId).serialize(),
+        cache: false,
         success: function($result){
-                
+            $('#' + $instanceId).modal('hide');
+            bootbox.alert($result);
+            loadPage();
             },
         error: function($result){
-            alert($result.responseText);
+            $('#' + $instanceId).modal('hide');
+            bootbox.alert($result.responseText);
             }
-              });
- 
-
-    loadPage();
-    $('#' + $instanceId).modal('hide');
+    });
 
 }
 

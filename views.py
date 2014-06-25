@@ -1,6 +1,6 @@
 import time
 
-from flask import Flask, render_template, request, Markup, make_response
+from flask import Flask, render_template, request, Markup, make_response, redirect, url_for
 from services import get_tile_clusters, get_images, get_master_instances, get_ec2_connection
 from boto.exception import EC2ResponseError
 
@@ -57,6 +57,7 @@ def images():
 
     return render_template('loader.html', **context)
 
+
 @app.route('/create-image', methods=['POST'])
 def create_image():
     id = request.form['id']
@@ -72,11 +73,11 @@ def create_image():
     
     try:
         ami_id = instance.create_image(name, description)
+        # sleep 2 seconds to make sure that we can load the AMI
+        time.sleep(2)
+        ami = conn.get_image(ami_id)
+        ami.add_tag('creator', user)
     except EC2ResponseError, e:
         return make_response(e.error_message, 500) 
-    
-    ami = conn.get_image(ami_id)
-    ami.add_tag('creator', user)
 
-    return "Ok"
-
+    return "AMI %s is getting created. It can take a while to show up under images!" % ami.id

@@ -1,3 +1,7 @@
+    <!-- Page-Level Plugin Scripts - Morris -->
+    <script src="{{ url_for('static', filename='js/plugins/morris/raphael-2.1.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/plugins/morris/morris.js') }}"></script>
+
 <div class="col-lg-12">
     {% for cluster in clusters %}
         <div class="panel panel-default">
@@ -84,8 +88,61 @@
 
                     </div>
                 </div>
+
+
+            <div class="row">
+                <div class="col-lg-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Tiles / minute
+                            </div>
+
+                            <div class="panel-body">
+                                <div id="area-chart-tiles-minute{{ loop.index }}" style="height: 250px;"></div>
+                            </div>
+                        </div>
+                </div>
+                <div class="col-lg-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                CPU usage
+                            </div>
+
+                            <div class="panel-body">
+                                <div id="area-chart-cpu-usage{{ loop.index }}" style="height: 250px;"></div>
+                            </div>
+                        </div>
+                </div>
             </div>
+
         </div>
+
+    <script type="application/javascript">
+        Morris.Area({
+            element: 'area-chart-tiles-minute{{ loop.index }}',
+
+            data: {{ cluster.elb_stats }},
+            xkey: 'Timestamp',
+            ykeys: ['Sum'],
+            labels: ['Requests'],
+            pointSize: 2,
+            hideHover: 'auto',
+            resize: true
+        });
+
+        Morris.Area({
+            element: 'area-chart-cpu-usage{{ loop.index }}',
+
+            data: {{ cluster.cpu_stats }},
+            xkey: 'Timestamp',
+            ykeys: ['Average'],
+            labels: ['CPU %'],
+            pointSize: 2,
+            hideHover: 'auto',
+            resize: true
+        });
+
+    </script>
 
         <!-- /.panel-body -->
     {% endfor %}

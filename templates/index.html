@@ -1,88 +1,94 @@
 <div class="col-lg-12">
-{% for cluster in clusters %}
-<div class="panel panel-default">
-<div class="panel-heading"><i class="fa fa-bar-chart-o fa-fw"></i> Stack: {{ cluster.stack.stack_name }}
+    {% for cluster in clusters %}
+        <div class="panel panel-default">
+        <div class="panel-heading"><i class="fa fa-bar-chart-o fa-fw"></i> Stack: {{ cluster.stack.stack_name }}
+             <span style="float: right;">
+                <button type="button" class="btn btn-xs btn-primary" onClick="showEditDialog('{{ cluster.group.name }}', '{{ cluster.group.desired_capacity }}');">
+                    <span class="glyphicon glyphicon-edit"></span> Edit
+                </button>
+                <button type="button" class="btn btn-xs btn-danger">
+                    <span class="glyphicon glyphicon-remove"></span> Delete
+                </button>
+            </span>
+        </div>
+        <div class="panel-body">
 
- <span style="float: right;">
-    <button type="button" class="btn btn-xs btn-primary" onClick="showEditDialog('{{ cluster.group.name }}', '{{ cluster.group.desired_capacity }}');">
-      <span class="glyphicon glyphicon-edit"></span> Edit
-  </button>
-<button type="button" class="btn btn-xs btn-danger">
-      <span class="glyphicon glyphicon-remove"></span> Delete
-  </button>
-    </span>
-</div>
-<!-- /.panel-heading -->
-
-<div class="row">
-    <div class="col-lg-6">
+            <div class="row">
+                    <div class="col-lg-6">
 
 
-       <div class="panel panel-default">
-                  <div class="panel-heading">
-                            Tile Cluster Details
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Tile Cluster Details
+                            </div>
+
+                            <div class="panel-body">
+                                <dl class="dl-horizontal">
+                                    <dt>URL</dt>
+                                    <dd>http://{{ cluster.elb.dns_name|lower }}</dd>
+                                    <dt>Capacity</dt>
+                                    <dd>{{ cluster.group.desired_capacity }}</dd>
+                                    <dt>AMI</dt>
+                                    <dd>{{ cluster.launch_config.image_id }}</dd>
+                                    <dt>Instance Type</dt>
+                                    <dd>{{ cluster.launch_config.instance_type }}</dd>
+                                    <dt>Stack State</dt>
+                                    <dd>{{ cluster.stack.stack_status|highlight_with_label }}</dd>
+                                    <dt>ELB State</dt>
+                                    <dd></dd>
+                                </dl>
+                            </div>
                         </div>
 
-            <div class="panel-body">
-                <dl class="dl-horizontal">
-            <dt>URL</dt><dd>http://{{ cluster.elb.dns_name|lower }}</dd>
-            <dt>Capacity</dt><dd>{{ cluster.group.desired_capacity }}</dd>
-            <dt>AMI</dt><dd>{{ cluster.launch_config.image_id }}</dd>
-            <dt>Instance Type</dt><dd>{{ cluster.launch_config.instance_type }}</dd>
-            <dt>Stack State</dt><dd>{{ cluster.stack.stack_status|highlight_with_label }}</dd>
-            <dt>ELB State</dt><dd></dd>
-    </dl>
-    </div>
-    </div>
+                    </div>
 
-    </div>
+                    <div class="col-lg-6">
 
-    <div class="col-lg-6">
-
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Instances
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Instances
+                            </div>
+                            <!-- /.panel-heading -->
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
                                         <tr>
                                             <th>#</th>
                                             <th>Instance</th>
                                             <th>AMI</th>
                                             <th>Instance Type</th>
                                             <th>IP Address</th>
-                                            <th>State<th>
+                                            <th>State
+                                            <th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for instance in cluster.instances %}
-                                    <tr>
-                                            <td>{{ loop.index }}</td>
-                                            <td>{{ instance.id }}</td>
-                                            <td>{{ instance.image_id }}</td>
-                                            <td>{{ instance.instance_type }}</td>
-                                            <td>{{ instance.private_ip_address }}</td>
-                                            <td>{{ instance.state|highlight_with_label }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                        {% for instance in cluster.instances %}
+                                            <tr>
+                                                <td>{{ loop.index }}</td>
+                                                <td>{{ instance.id }}</td>
+                                                <td>{{ instance.image_id }}</td>
+                                                <td>{{ instance.instance_type }}</td>
+                                                <td>{{ instance.private_ip_address }}</td>
+                                                <td>{{ instance.state|highlight_with_label }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.table-responsive -->
                             </div>
-                            <!-- /.table-responsive -->
+
                         </div>
 
-    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-</div>
-
-</div>
-</div>
-</div>
-<!-- /.panel-body -->
-{% endfor %}
+        <!-- /.panel-body -->
+    {% endfor %}
 </div>
 
 

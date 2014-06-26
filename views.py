@@ -1,7 +1,7 @@
 import time
 
 from flask import Flask, render_template, request, Markup, make_response, redirect, url_for
-from services import get_tile_clusters, get_images, get_master_instances, get_ec2_connection
+from services import get_tile_clusters, get_images, get_master_instances, get_ec2_connection, get_cloudformation_connection
 from boto.exception import EC2ResponseError
 
 app = Flask(__name__)
@@ -27,7 +27,7 @@ def highlight_with_label(s):
     if s in ('RUNNING', 'AVAILABLE', 'CREATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE'):
         return Markup(html % ('label-success', s))
     # info
-    elif s in ('PENDING'):
+    elif s in ('PENDING', 'CREATE_IN_PROGRESS'):
         return Markup(html % ('label-info', s))
     # danger
     elif s in ('STOPPED'):
@@ -50,6 +50,7 @@ def images():
     if request.is_xhr:
         context['images'] = get_images()
         context['instances'] = get_master_instances()
+        context['launch_form'] = Markup(render_template('launch-form.html').replace('\n', ''))
         return render_template('images.html', **context)
 
     return render_template('loader.html', **context)
@@ -78,3 +79,19 @@ def create_image():
         return make_response(e.error_message, 500) 
 
     return "AMI %s is getting created. It can take a while to show up under images!" % ami.id
+
+@app.route('/launch-cluster', methods=['POST'])
+def launch_cluster():
+
+    template = render_template('template.json')
+
+    params = [
+        ('InstanceType', request.form['instance-type']),
+        ('ImageId', request.form['ami']),
+        ('DesiredCapacity', request.form['capacity']),
+    ]
+
+    conn = get_cloudformation_connection()
+    conn.create_stack("Test-Stack", template_body=template, parameters=params)
+
+    return "Cluster successfully launched! Go to <a href='"+url_for('index')+"'>Index Page</a>"

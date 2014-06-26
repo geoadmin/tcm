@@ -1,0 +1,20 @@
+<form id='launchform' class='form-horizontal' role='form' action='/launch-cluster' method='post'>
+  <div class='form-group'>
+    <label for='inputCapacity' class='col-sm-3 control-label'>Capacity</label>
+    <div class='col-sm-9'>
+      <input type='text' name='capacity' class='form-control' id='inputCapacity' value='5'>
+    </div>
+  </div>
+  <div class='form-group'>
+    <label for='inputType' class='col-sm-3 control-label'>Instance Type</label>
+    <div class='col-sm-9'>
+      <input type='text' name='instance-type' class='form-control' id='inputType' value='c3.xlarge'>
+    </div>
+  </div>
+  <div class='form-group'>
+    <label for='inputAmi' class='col-sm-3 control-label'>AMI</label>
+    <div class='col-sm-9'>
+      <input type='text' name='ami' class='form-control' id='inputAmi' value='"+instanceId+"' readonly='readonly'>
+    </div>
+  </div>
+</form>

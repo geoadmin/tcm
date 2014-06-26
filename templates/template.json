@@ -1,0 +1,79 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "AWS CloudFormation template to create a fixed-size WMS tile cluster",
+
+  "Parameters" : {
+    "InstanceType" : {
+      "Description" : "EC2 instance type",
+      "Type" : "String",
+      "Default" : "c3.xlarge",
+      "ConstraintDescription" : "must be a valid EC2 instance type."
+    },
+	"ImageId" : {
+   	 "Description" : "AMI to use for that cluster",
+     "Type" : "String",
+     "Default" : "ami-57ce0620",
+     "ConstraintDescription" : "must be a valid AMI"
+ 	},
+  	"DesiredCapacity" : {
+     "Description" : "Number of instances for that cluster",
+     "Type": "Number",
+     "Default" : "2",
+     "MinValue" : "1",
+     "MaxValue" : "20"
+   	}
+  },
+
+  "Resources" : {
+    "WmsCluster" : {
+      "Type" : "AWS::AutoScaling::AutoScalingGroup",
+      "Properties" : {
+        "AvailabilityZones" : ["eu-west-1a" ],
+        "LaunchConfigurationName" : { "Ref" : "LaunchConfig" },
+        "DesiredCapacity": { "Ref": "DesiredCapacity" },
+        "MinSize" : "1",
+        "MaxSize" : "20",
+        "LoadBalancerNames" : [ { "Ref" : "ElasticLoadBalancer" } ],
+        "VPCZoneIdentifier": ["subnet-1820cf6f"]
+      }
+    },
+
+    "LaunchConfig" : {
+      "Type" : "AWS::AutoScaling::LaunchConfiguration",
+      "Properties" : {
+        "ImageId" : { "Ref" : "ImageId" },
+        "InstanceType" : { "Ref" : "InstanceType" },
+        "SecurityGroups" : [ "sg-91d01ff4" ],
+        "AssociatePublicIpAddress": false
+
+      }
+    },
+
+    "ElasticLoadBalancer" : {
+      "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties" : {
+        "Subnets": ["subnet-1820cf6f"],
+        "Listeners" : [ {
+          "LoadBalancerPort" : "80",
+          "InstancePort" : "80",
+          "Protocol" : "HTTP"
+        } ],
+        "HealthCheck" : {
+          "Target" : { "Fn::Join" : [ "", ["HTTP:", "80", "/index.html"]]},
+          "HealthyThreshold" : "3",
+          "UnhealthyThreshold" : "5",
+          "Interval" : "30",
+          "Timeout" : "5"
+        }
+      }
+    }
+  },
+
+  "Outputs" : {
+    "URL" : {
+      "Description" : "URL of the ELB",
+      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticLoadBalancer", "DNSName" ]}]]}
+    }
+  }
+}

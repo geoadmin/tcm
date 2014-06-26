@@ -23,6 +23,7 @@
                     <td>{{ image.description }}</td>
                     <td>{{ image.tags.creator }}</td>
                     <td>{{ image.state|highlight_with_label }}</td>
+                    <td><button type="button" class="btn btn-default" onClick="showLaunchDialog('{{ image.id }}');">Launch Cluster</button></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -54,7 +55,7 @@
                     <td>{{ instance.id }}</td>
                     <td>{{ instance.tags.Name }}</td>
                     <td>{{ instance.state|highlight_with_label }}</td>
-                    <td><button type="button" class="btn btn-default" onClick="showImageDialog('{{ instance.id }}')">Create Image</button></td>
+                    <td><button type="button" class="btn btn-default" onClick="showImageDialog('{{ instance.id }}');">Create Image</button></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -72,9 +73,58 @@
 
 <script type="text/javascript">
 
+    var showLaunchDialog = function (instanceId) {
+
+        BootstrapDialog.show({
+            title: '',
+            message: "{{ launch_form }}",
+            buttons: [
+                {
+                    icon: 'glyphicon glyphicon-send',
+                    label: 'Launch Cluster',
+                    cssClass: 'btn-primary',
+                    autospin: true,
+                    action: function (dialogRef) {
+                        dialogRef.enableButtons(false);
+                        dialogRef.setClosable(false);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/launch-cluster",
+                            data: $('#launchform').serialize(),
+                            cache: false,
+                            success: function (result) {
+                                dialogRef.close();
+                                BootstrapDialog.alert({
+                                    message: result,
+                                    type: BootstrapDialog.TYPE_SUCCESS
+                                });
+                                loadPage();
+                            },
+                            error: function (result) {
+                                dialogRef.close();
+                                BootstrapDialog.alert({
+                                    message: result.responseText,
+                                    type: BootstrapDialog.TYPE_DANGER
+                                });
+                            }
+                        });
+                    }
+                },
+                {
+                    label: 'Close',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                }
+            ]
+        });
+    }
+
     var showImageDialog = function (instanceId) {
 
         BootstrapDialog.show({
+            title: '',
             message: "Description: <form id='imageform'><input type='hidden' name='id' value='" + instanceId + "'/><input type='text' name='description' /> </form>",
             buttons: [
                 {

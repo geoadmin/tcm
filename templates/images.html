@@ -1,9 +1,8 @@
 <div class="col-lg-12">
+
+<!-- Image Panel -->
 <div class="panel panel-default">
-
 <div class="panel-heading"><i class="fa fa-bar-chart-o fa-fw"></i> Images</div>
-<!-- /.panel-heading -->
-
 <div class="panel-body">
     <div class="table-responsive">
         <table class="table table-striped">
@@ -31,7 +30,10 @@
     </div>
     <!-- /.table-responsive -->
 </div>
+</div>
 
+<!-- Instance Panel -->
+<div class="panel panel-default">
 <div class="panel-heading"><i class="fa fa-bar-chart-o fa-fw"></i> Master Instances</div>
 <!-- /.panel-heading -->
 
@@ -52,40 +54,7 @@
                     <td>{{ instance.id }}</td>
                     <td>{{ instance.tags.Name }}</td>
                     <td>{{ instance.state|highlight_with_label }}</td>
-                    <td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#{{ instance.id }}">Create Image</button></td>
-
-
-
-                            <div class="modal fade" id="{{ instance.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-                                        </div>
-                                            <form id="form-{{ instance.id }}">
-                        <input type='hidden' name='id' value='{{ instance.id }}'/>
-            <fieldset>
-                 <div class="modal-body">
-                     <ul class="nav nav-list">
-                <li class="nav-header">Description</li>
-                <li><input class="input-xlarge" value="" type="text" name="description"></li>
-                </ul> 
-                </div>
-            </fieldset>
-            </form> 
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Abort</button>
-                                            <button type="button" id='create-image' class="btn btn-primary" data-loading-text="Loading..." onClick="$(this).button('loading'); createImage('{{ instance.id }}');">Create Image</button>
-                                        </div>
-                                    </div>
-                                    <!-- /.modal-content -->
-                                </div>
-                                <!-- /.modal-dialog -->
-                            </div>
-                            <!-- /.modal -->
-
-
+                    <td><button type="button" class="btn btn-default" onClick="showImageDialog('{{ instance.id }}')">Create Image</button></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -97,29 +66,63 @@
 </div>
 </div>
 
-<script>
 
-var createImage = function($instanceId) {
-  
- $.ajax({
-            type: "POST",
-        url: "/create-image",
-        data: $('#form-' + $instanceId).serialize(),
-        cache: false,
-        success: function($result){
-            $('#' + $instanceId).modal('hide');
-            bootbox.alert($result);
-            loadPage();
-            },
-        error: function($result){
-            $('#' + $instanceId).modal('hide');
-            bootbox.alert($result.responseText);
-            }
-    });
 
-}
+{%  block javascript %}
+
+<script type="text/javascript">
+
+    var showImageDialog = function (instanceId) {
+
+        BootstrapDialog.show({
+            message: "Description: <form id='imageform'><input type='hidden' name='id' value='" + instanceId + "'/><input type='text' name='description' /> </form>",
+            buttons: [
+                {
+                    icon: 'glyphicon glyphicon-send',
+                    label: 'Create Image',
+                    cssClass: 'btn-primary',
+                    autospin: true,
+                    action: function (dialogRef) {
+                        dialogRef.enableButtons(false);
+                        dialogRef.setClosable(false);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/create-image",
+                            data: $('#imageform').serialize(),
+                            cache: false,
+                            success: function (result) {
+                                dialogRef.close();
+                                BootstrapDialog.alert({
+                                    message: result,
+                                    type: BootstrapDialog.TYPE_SUCCESS
+                                });
+                                loadPage();
+                            },
+                            error: function (result) {
+                                dialogRef.close();
+                                BootstrapDialog.alert({
+                                    message: result.responseText,
+                                    type: BootstrapDialog.TYPE_DANGER
+                                });
+                            }
+                        });
+                    }
+                },
+                {
+                    label: 'Close',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                }
+            ]
+        });
+
+    }
 
 </script>
+
+{% endblock %}
 
 
 

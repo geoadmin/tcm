@@ -34,9 +34,6 @@ def highlight_with_label(s):
         return Markup(html % ('label-danger', s))
     else:
         return Markup(html % ('label-default', s))
-        
-
-    return s[::-1]
 
 @app.route('/')
 def index():
@@ -70,7 +67,7 @@ def create_image():
     instance = instances[0]
 
     name = "%s_%s" % (instance.tags['Name'], time.strftime("%Y-%m-%d_%H-%M-%S"))
-    
+
     try:
         ami_id = instance.create_image(name, description)
         # sleep 2 seconds to make sure that we can load the AMI

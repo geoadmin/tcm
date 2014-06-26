@@ -17,26 +17,26 @@
 {% endblock %}
 
 {% block javascript %}
+<script type="text/javascript">
+    function loadPage() {
+        $.ajax({
+            type: 'GET',
+            url: '{{ request.url }}',
+            cache: false,
+            success:function(result){
+                // successful request; do something with the data
+                // console.log(result);
+                $('#ajax-panel').html(result);
+            },
+            error:function(){
+                // failed request; give feedback to user
+                $('#ajax-panel').html('<div class="panel-heading"><div class="panel-body"><div class="alert alert-danger"><strong>Oops!</strong> Try that again in a few moments.</div></div>');
+            }
+        });
+    }
 
-function loadPage() {
-    $.ajax({
-        type: 'GET',
-        url: '{{ request.url }}',
-        cache: false,
-        success:function(result){
-            // successful request; do something with the data
-            // console.log(result);
-            $('#ajax-panel').html(result);
-        },
-        error:function(){
-            // failed request; give feedback to user
-            $('#ajax-panel').html('<div class="panel-heading"><div class="panel-body"><div class="alert alert-danger"><strong>Oops!</strong> Try that again in a few moments.</div></div>');
-        }
-    });
-}
-
-$(document).ready(function() {
-    loadPage();
-})
-
+    $(document).ready(function() {
+        loadPage();
+    })
+</script>
 {% endblock %}

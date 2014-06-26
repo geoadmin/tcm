@@ -2,10 +2,17 @@
 {% for cluster in clusters %}
 <div class="panel panel-default">
 <div class="panel-heading"><i class="fa fa-bar-chart-o fa-fw"></i> Stack: {{ cluster.stack.stack_name }}
+
+ <span style="float: right;">
+    <button type="button" class="btn btn-xs btn-primary" onClick="showEditDialog('{{ cluster.group.name }}', '{{ cluster.group.desired_capacity }}');">
+      <span class="glyphicon glyphicon-edit"></span> Edit
+  </button>
+<button type="button" class="btn btn-xs btn-danger">
+      <span class="glyphicon glyphicon-remove"></span> Delete
+  </button>
+    </span>
 </div>
 <!-- /.panel-heading -->
-
-<div id="ajax-panel" class="panel-body">
 
 <div class="row">
     <div class="col-lg-6">
@@ -78,3 +85,58 @@
 {% endfor %}
 </div>
 
+
+{%  block javascript %}
+
+<script type="text/javascript">
+
+    var showEditDialog = function (groupName, capacity) {
+
+        BootstrapDialog.show({
+            title: '',
+            message: "Capacity: <form id='editform'><input type='hidden' name='group_name' value='" + groupName + "'/><input type='text' name='capacity' value='"+capacity+"' /> </form>",
+            buttons: [
+                {
+                    icon: 'glyphicon glyphicon-send',
+                    label: 'Edit Cluster',
+                    cssClass: 'btn-primary',
+                    autospin: true,
+                    action: function (dialogRef) {
+                        dialogRef.enableButtons(false);
+                        dialogRef.setClosable(false);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/edit-cluster",
+                            data: $('#editform').serialize(),
+                            cache: false,
+                            success: function (result) {
+                                dialogRef.close();
+                                BootstrapDialog.alert({
+                                    message: result,
+                                    type: BootstrapDialog.TYPE_SUCCESS
+                                });
+                                loadPage();
+                            },
+                            error: function (result) {
+                                dialogRef.close();
+                                BootstrapDialog.alert({
+                                    message: result.responseText,
+                                    type: BootstrapDialog.TYPE_DANGER
+                                });
+                            }
+                        });
+                    }
+                },
+                {
+                    label: 'Close',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                }
+            ]
+        });
+    }
+</script>
+
+{% endblock %}

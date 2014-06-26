@@ -1,8 +1,8 @@
 import time
 
 from flask import Flask, render_template, request, Markup, make_response, redirect, url_for
-from services import get_tile_clusters, get_images, get_master_instances, get_ec2_connection, get_cloudformation_connection
-from boto.exception import EC2ResponseError
+from services import get_tile_clusters, get_images, get_master_instances, get_ec2_connection, get_cloudformation_connection, get_autoscale_connection
+from boto.exception import EC2ResponseError, BotoServerError
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -95,3 +95,16 @@ def launch_cluster():
     conn.create_stack("Test-Stack", template_body=template, parameters=params)
 
     return "Cluster successfully launched! Go to <a href='"+url_for('index')+"'>Index Page</a>"
+
+@app.route('/edit-cluster', methods=['POST'])
+def edit_cluster():
+    conn = get_autoscale_connection()
+    group_name = request.form['group_name']
+    capacity = request.form['capacity']
+
+    try:
+        conn.set_desired_capacity(group_name, capacity)
+    except BotoServerError, e:
+        return make_response(e.error_message, 500)
+
+    return "Cluster %s capacity updated to %s nodes!" % (group_name, capacity)

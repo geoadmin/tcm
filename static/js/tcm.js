@@ -39,7 +39,7 @@ var loadElbStats = function (elb_name) {
                 }
             }
             else {
-                $("#elb-stats" + elb_name).html('<div class="alert alert-warning" role="alert">No data available</div>');
+                $("#elb-stats-" + elb_name).html('<div class="alert alert-warning text-center" role="alert">No data available</div>');
             }
             setTimeout(loadElbStats, 30000, elb_name);
         }
@@ -81,7 +81,9 @@ var loadCpuStats = function (group_name) {
                     cpuStats[group_name] = graph;
                 }
             }
-
+            else {
+                $("#cpu-stats-" + group_name).html('<div class="alert alert-warning text-center" role="alert">No data available</div>');
+            }
 
         }
 

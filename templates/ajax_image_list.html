@@ -1,0 +1,25 @@
+   <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>AMI</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Creator</th>
+                    <th>State</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for image in images %}
+                <tr>
+                    <td>{{ image.id }}</td>
+                    <td>{{ image.name }}</td>
+                    <td>{{ image.description }}</td>
+                    <td>{{ image.tags.creator }}</td>
+                    <td>{{ image.state|highlight_with_label }}</td>
+                    <td><button type="button" class="btn btn-default" onClick="showLaunchDialog('{{ image.id }}');">Launch Cluster</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>

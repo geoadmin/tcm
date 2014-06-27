@@ -1,9 +1,11 @@
 var loadClusterInstances = function (group_name) {
     console.log("Loadig data for " + group_name)
     $("#cluster-instances-" + group_name).load("/ajax-cluster-instances", { "group_name": group_name }, function () {
-        //setTimeout(loadClusterInstances(), 5000);
+        setTimeout(loadClusterInstances, 15000, group_name);
     });
 }
+
+var elbStats = new Array();
 
 var loadElbStats = function (elb_name) {
 
@@ -16,26 +18,37 @@ var loadElbStats = function (elb_name) {
         success: function (result) {
             $("#loader-" + elb_name).remove();
             if (result.length > 0) {
-                Morris.Area({
-                    element: "elb-stats-" + elb_name,
-                    data: result,
-                    xkey: 'Timestamp',
-                    ykeys: ['Sum'],
-                    labels: ['Requests'],
-                    pointSize: 2,
-                    hideHover: 'auto',
-                    resize: true
-                });
+                var graph = null;
+                if (elb_name in elbStats) {
+                    graph = elbStats[elb_name];
+                    graph.setData(result);
+                    elbStats[elb_name] = graph;
+                }
+                else {
+                    graph = Morris.Area({
+                        element: "elb-stats-" + elb_name,
+                        data: result,
+                        xkey: 'Timestamp',
+                        ykeys: ['Sum'],
+                        labels: ['Requests'],
+                        pointSize: 2,
+                        hideHover: 'auto',
+                        resize: true
+                    });
+                    elbStats[elb_name] = graph;
+                }
             }
             else {
                 $("#elb-stats" + elb_name).html('<div class="alert alert-warning" role="alert">No data available</div>');
             }
-            //setTimeout("loadElbStats('"+elb_name+"');", 10000)
+            setTimeout(loadElbStats, 30000, elb_name);
         }
     })
 
 
 }
+
+var cpuStats = Array();
 
 var loadCpuStats = function (group_name) {
 
@@ -48,21 +61,34 @@ var loadCpuStats = function (group_name) {
         success: function (result) {
             $("#loader-" + group_name).remove();
             if (result.length > 0) {
-                Morris.Area({
-                    element: "cpu-stats-" + group_name,
-                    data: result,
-                    xkey: 'Timestamp',
-                    ykeys: ['Average'],
-                    labels: ['CPU %'],
-                    pointSize: 2,
-                    hideHover: 'auto',
-                    resize: true
-                });
+                var graph = null;
+                if (group_name in cpuStats) {
+                    graph = cpuStats[group_name];
+                    graph.setData(result);
+                    cpuStats[group_name] = graph;
+                }
+                else {
+                    var graph = Morris.Area({
+                        element: "cpu-stats-" + group_name,
+                        data: result,
+                        xkey: 'Timestamp',
+                        ykeys: ['Average'],
+                        labels: ['CPU %'],
+                        pointSize: 2,
+                        hideHover: 'auto',
+                        resize: true
+                    });
+                    cpuStats[group_name] = graph;
+                }
             }
 
 
         }
+
+
     })
+
+    setTimeout(loadCpuStats, 30000, group_name);
 
 
 }

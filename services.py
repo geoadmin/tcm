@@ -73,10 +73,16 @@ def get_autoscaling_group(group_name):
 
 
 def get_cluster_instances(group_name):
+    ec2 = get_aws_connection('ec2')
+
     group = get_autoscaling_group(group_name)
     instance_ids = [i.instance_id for i in group.instances]
-    ec2 = get_aws_connection('ec2')
-    return ec2.get_only_instances(instance_ids=instance_ids)
+
+    if len(instance_ids) > 0:
+        return ec2.get_only_instances(instance_ids=instance_ids)
+    else:
+        return []
+
 
 
 def get_stats(period, start_time, end_time, metric_name, namespace, statistics, dimensions):

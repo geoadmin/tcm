@@ -93,7 +93,8 @@ def get_stats(period, start_time, end_time, metric_name, namespace, statistics, 
 
 def get_images():
     ec2 = get_aws_connection('ec2')
-    images = ec2.get_all_images(owners=['self'])
+    filters = {'tag:tcm': 'image'}
+    images = ec2.get_all_images(owners=['self'], filters=filters)
     return images
 
 def get_master_instances():

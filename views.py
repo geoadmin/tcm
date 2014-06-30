@@ -95,6 +95,7 @@ def create_image():
         time.sleep(2)
         ami = conn.get_image(ami_id)
         ami.add_tag('creator', user)
+        ami.add_tag('tcm', 'image')
     except EC2ResponseError, e:
         return make_response(e.error_message, 500)
 

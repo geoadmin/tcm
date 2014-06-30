@@ -1,27 +1,31 @@
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Instance</th>
-                                            <th>AMI</th>
-                                            <th>Instance Type</th>
-                                            <th>IP Address</th>
-                                            <th>State
-                                            <th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {% for instance in instances %}
-                                            <tr>
-                                                <td>{{ loop.index }}</td>
-                                                <td>{{ instance.id }}</td>
-                                                <td>{{ instance.image_id }}</td>
-                                                <td>{{ instance.instance_type }}</td>
-                                                <td>{{ instance.private_ip_address }}</td>
-                                                <td>{{ instance.state|highlight_with_label }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
+{% if instances %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Instance</th>
+                <th>AMI</th>
+                <th>Instance Type</th>
+                <th>IP Address</th>
+                <th>State
+                <th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for instance in instances %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ instance.id }}</td>
+                    <td>{{ instance.image_id }}</td>
+                    <td>{{ instance.instance_type }}</td>
+                    <td>{{ instance.private_ip_address }}</td>
+                    <td>{{ instance.state|highlight_with_label }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-warning text-center" role="alert">No instances found</div>
+{% endif %}

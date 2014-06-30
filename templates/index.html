@@ -3,9 +3,11 @@
         <div class="panel panel-default">
         <div class="panel-heading"><i class="fa fa-bar-chart-o fa-fw"></i> Stack: {{ stack_name }}
              <span style="float: right;">
+                 {% if cluster.group %}
                 <button type="button" class="btn btn-xs btn-primary" onClick="showEditDialog('{{ cluster.group.name }}');">
                     <span class="glyphicon glyphicon-edit"></span> Edit
                 </button>
+                 {% endif %}
                 <button type="button" class="btn btn-xs btn-danger" onclick="showDeleteDialog('{{ cluster.stack_id }}');">
                     <span class="glyphicon glyphicon-remove"></span> Delete
                 </button>
@@ -23,7 +25,9 @@
                             </div>
 
                             <div class="panel-body">
+                                <div id="cluster-details-{{ cluster.stack_id }}">
                                 {{ cluster }}
+                                </div>
                             </div>
                         </div>
 
@@ -36,9 +40,14 @@
                                 Instances
                             </div>
                             <!-- /.panel-heading -->
-                            <div class="panel-body" id="cluster-instances-{{ cluster.group.name }}">
-                                <img src="{{ url_for('static', filename='img/ajax-loader.gif') }}" alt="Loading..." class="center" />
-
+                            <div class="panel-body">
+                                {% if cluster.group %}
+                                    <div id="cluster-instances-{{ cluster.group.name }}">
+                                        <img src="{{ url_for('static', filename='img/ajax-loader.gif') }}" alt="Loading..." class="center" />
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning text-center" role="alert">No instances found</div>
+                                {% endif %}
                             </div>
 
                         </div>
@@ -55,9 +64,13 @@
                             </div>
 
                             <div class="panel-body">
+                                {% if cluster.elb %}
                                 <div id="elb-stats-{{ cluster.elb.name }}" style="height: 250px;">
                                         <img id="loader-{{ cluster.elb.name }}" src="{{ url_for('static', filename='img/ajax-loader.gif') }}" alt="Loading..." class="center" />
                                 </div>
+                                {% else %}
+                                    <div class="alert alert-warning text-center" role="alert">No data found</div>
+                                {% endif %}
                             </div>
                         </div>
                 </div>
@@ -68,9 +81,13 @@
                             </div>
 
                             <div class="panel-body">
+                                {% if cluster.group %}
                                 <div id="cpu-stats-{{ cluster.group.name }}" style="height: 250px;">
                                         <img id="loader-{{ cluster.group.name }}" src="{{ url_for('static', filename='img/ajax-loader.gif') }}" alt="Loading..." class="center" />
                                 </div>
+                                {% else %}
+                                    <div class="alert alert-warning text-center" role="alert">No data found</div>
+                                {% endif %}
                             </div>
                         </div>
                 </div>
@@ -93,9 +110,16 @@
 
     // run the first time; all subsequent calls will take care of themselves
     {% for stack_name,cluster in clusters.iteritems() %}
-        loadClusterInstances("{{ cluster.group.name }}");
-        loadElbStats("{{ cluster.elb.name }}");
-        loadCpuStats("{{ cluster.group.name }}");
+
+        {% if cluster.group %}
+            loadClusterInstances("{{ cluster.group.name }}");
+            loadCpuStats("{{ cluster.group.name }}");
+        {% endif %}
+
+        {% if cluster.elb %}
+            loadElbStats("{{ cluster.elb.name }}");
+        {% endif %}
+
     {% endfor %}
 
 </script>

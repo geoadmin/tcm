@@ -1,4 +1,5 @@
-   <div class="table-responsive">
+{% if images %}
+    <div class="table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -23,3 +24,6 @@
             </tbody>
         </table>
     </div>
+{% else %}
+    <div class="alert alert-warning text-center" role="alert">No images found</div>
+{% endif %}

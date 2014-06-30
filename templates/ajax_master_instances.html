@@ -1,22 +1,30 @@
+{% if instances %}
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
-                <tr>
-                    <th>Instance</th>
-                    <th>Name</th>
-                    <th>State</th>
-                    <th>Action</th>
-                </tr>
+            <tr>
+                <th>Instance</th>
+                <th>Name</th>
+                <th>State</th>
+                <th>Action</th>
+            </tr>
             </thead>
             <tbody>
-                {% for instance in instances %}
+            {% for instance in instances %}
                 <tr>
                     <td>{{ instance.id }}</td>
                     <td>{{ instance.tags.Name }}</td>
                     <td>{{ instance.state|highlight_with_label }}</td>
-                    <td><button type="button" class="btn btn-default" onClick="showImageDialog('{{ instance.id }}');">Create Image</button></td>
+                    <td>
+                        <button type="button" class="btn btn-default" onClick="showImageDialog('{{ instance.id }}');">Create
+                            Image
+                        </button>
+                    </td>
                 </tr>
-                {% endfor %}
+            {% endfor %}
             </tbody>
         </table>
     </div>
+{% else %}
+    <div class="alert alert-warning text-center" role="alert">No instances found</div>
+{% endif %}

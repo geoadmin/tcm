@@ -3,6 +3,8 @@ _basedir = os.path.abspath(os.path.dirname(__file__))
 
 DEBUG = False
 
+USER_HEADER = 'X-Remote-User'
+
 ADMINS = frozenset(['admin@example.com'])
 SECRET_KEY = 'your-random-string-goes-here'
 

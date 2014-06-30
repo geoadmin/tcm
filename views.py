@@ -1,4 +1,4 @@
-import time, datetime
+import time, datetime, config
 
 from flask import Flask, render_template, request, Markup, make_response, redirect, url_for, jsonify
 from services import describe_clusters, get_cluster_instances, get_stats, get_images, get_master_instances, \
@@ -25,10 +25,6 @@ def ajax_cluster_details():
     config_name = request.form['config_name']
     elb_name = request.form['elb_name']
     #instances = get_cluster_instances(group_name)
-
-    print group_name
-    print config_name
-    print elb_name
 
     context = {
 
@@ -151,41 +147,14 @@ def launch_cluster():
     return "Cluster '%s' successfully launched! Go to <a href='%s'>Index Page</a>" % (stackName, url_for('index'))
 
 
-
-
-
 # Register custom template filters
 app.jinja_env.filters['highlight_with_label'] = highlight_with_label
 
 # Register
 @app.context_processor
 def inject_user():
-    username = request.headers.get('REMOTE_USER')
+    username = request.headers.get(config.USER_HEADER)
     if username is None:
         username = "Anyonmous"
 
     return dict(username=username)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

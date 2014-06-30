@@ -1,0 +1,10 @@
+import os
+_basedir = os.path.abspath(os.path.dirname(__file__))
+
+DEBUG = False
+
+ADMINS = frozenset(['admin@example.com'])
+SECRET_KEY = 'your-random-string-goes-here'
+
+AWS_ACCESS_KEY_ID = ''
+AWS_SECERET_ACCESS_KEY = ''

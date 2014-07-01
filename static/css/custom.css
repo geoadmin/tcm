@@ -13,3 +13,18 @@ img.center {
     margin-left: auto;
     margin-right: auto;
 }
+
+dl {
+ width:100%;
+ overflow:hidden;
+ padding: 5px;
+}
+dt {
+ float:left;
+ width:15%; /* adjust the width; make sure the total of both is 100% */
+
+}
+dd {
+ float:left;
+ width:85%; /* adjust the width; make sure the total of both is 100% */
+}

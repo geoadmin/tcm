@@ -1,0 +1,6 @@
+<dl>
+    <dt>URL</dt><dd><a href="http://{{ cluster.elb.dns_name|lower }}">http://{{ cluster.elb.dns_name|lower }}</a></dd>
+    <dt>Nodes</dt><dd>{{ cluster.group.desired_capacity }}</dd>
+    <dt>Stack Status</dt><dd>{{ cluster.stack.stack_status|highlight_with_label }}</dd>
+    <dt>ELB Status</dt>{{ elbInService }} / {{ instanceCount }} in Service<dd></dd>
+</dl>

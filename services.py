@@ -2,6 +2,7 @@ import config, datetime, json
 from boto import ec2, cloudformation
 from boto.ec2 import autoscale, elb, cloudwatch
 from flask import Markup
+from boto.exception import BotoServerError
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -32,24 +33,26 @@ def get_aws_connection(service, region_name='eu-west-1'):
         raise Exception("Unkown service '%s'" % service)
 
 
-def describe_clusters():
+def describe_clusters(stack_name_or_id=None):
 
     cf = get_aws_connection('cloudformation')
     elb = get_aws_connection('elb')
     autoscale = get_aws_connection('autoscale')
 
     # get a list of active stacks
-    stacks = [stack for stack in cf.describe_stacks() if stack.stack_status not in ('ROLLBACK_COMPLETE')]
+    try:
+        stacks = [stack for stack in cf.describe_stacks(stack_name_or_id=stack_name_or_id) if stack.stack_status not in ('ROLLBACK_COMPLETE')]
+    except BotoServerError, e:
+        # log
+        return None
 
-    # sort list by stack creation time
-    stacks.sort(key=lambda x: x.creation_time, reverse=True)
-
-    clusters = {}
+    clusters = []
     for stack in stacks:
-            cluster = {'stack_id': stack.stack_id}
+            cluster = {'stack': stack}
             for resource in stack.list_resources():
                 if resource.resource_type == 'AWS::ElasticLoadBalancing::LoadBalancer':
                     cluster['elb'] = elb.get_all_load_balancers(load_balancer_names=[resource.physical_resource_id])[0]
+
                 elif resource.resource_type == 'AWS::AutoScaling::LaunchConfiguration':
                     kwargs = {'names': [resource.physical_resource_id]}
                     cluster['launch_config'] = autoscale.get_all_launch_configurations(**kwargs)[0]
@@ -58,7 +61,10 @@ def describe_clusters():
                 else:
                     raise Exception("Unkonw resource type '%s'" % resource.resource_type)
 
-            clusters[stack.stack_name] = (cluster)
+            clusters.append(cluster)
+
+    # sort list by stack creation time
+    clusters.sort(key=lambda x: x['stack'].creation_time, reverse=True)
 
     return clusters
 

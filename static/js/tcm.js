@@ -1,3 +1,9 @@
+var loadClusterDetails = function (stack_name) {
+    $("#cluster-details-" + stack_name).load("/ajax-cluster-details", { "stack_name": stack_name }, function () {
+        setTimeout(loadClusterDetails, 5000, stack_name);
+    });
+}
+
 var loadClusterInstances = function (group_name) {
     console.log("Loadig data for " + group_name)
     $("#cluster-instances-" + group_name).load("/ajax-cluster-instances", { "group_name": group_name }, function () {
@@ -76,7 +82,8 @@ var loadCpuStats = function (group_name) {
                         labels: ['CPU %'],
                         pointSize: 2,
                         hideHover: 'auto',
-                        resize: true
+                        resize: true,
+                        postUnits: '%'
                     });
                     cpuStats[group_name] = graph;
                 }

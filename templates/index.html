@@ -1,7 +1,7 @@
 <div class="col-lg-12">
-    {% for stack_name,cluster in clusters.iteritems() %}
+    {% for cluster in clusters %}
         <div class="panel panel-default">
-        <div class="panel-heading"><i class="fa fa-bar-chart-o fa-fw"></i> Stack: {{ stack_name }}
+        <div class="panel-heading"><i class="fa fa-bar-chart-o fa-fw"></i> Stack: {{ cluster.stack.stack_name }}
              <span style="float: right;">
                  {% if cluster.group %}
                 <button type="button" class="btn btn-xs btn-primary" onClick="showEditDialog('{{ cluster.group.name }}');">
@@ -25,8 +25,8 @@
                             </div>
 
                             <div class="panel-body">
-                                <div id="cluster-details-{{ cluster.stack_id }}">
-                                {{ cluster }}
+                                <div id="cluster-details-{{ cluster.stack.stack_name }}">
+                                    <img src="{{ url_for('static', filename='img/ajax-loader.gif') }}" alt="Loading..." class="center" />
                                 </div>
                             </div>
                         </div>
@@ -77,7 +77,7 @@
                 <div class="col-lg-6">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                CPU usage
+                                Cluster Average CPU usage
                             </div>
 
                             <div class="panel-body">
@@ -110,7 +110,9 @@
 <script type="application/javascript">
 
     // run the first time; all subsequent calls will take care of themselves
-    {% for stack_name,cluster in clusters.iteritems() %}
+    {% for cluster in clusters %}
+
+        loadClusterDetails("{{ cluster.stack.stack_name  }}")
 
         {% if cluster.group %}
             loadClusterInstances("{{ cluster.group.name }}");

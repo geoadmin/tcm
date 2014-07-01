@@ -21,13 +21,19 @@ def index():
 
 @app.route('/ajax-cluster-details', methods=['POST'])
 def ajax_cluster_details():
-    group_name = request.form['group_name']
-    config_name = request.form['config_name']
-    elb_name = request.form['elb_name']
-    #instances = get_cluster_instances(group_name)
+    stack_name = request.form['stack_name']
+
+    clusters = describe_clusters(stack_name)
+    if len(clusters) > 0:
+        cluster = clusters[0]
+
+    instanceInfos = cluster['elb'].get_instance_health()
+    elbInService = sum(i.state == 'InService' for i in instanceInfos)
 
     context = {
-
+        'cluster': cluster,
+        'elbInService': elbInService,
+        'instanceCount': len(instanceInfos),
     }
 
     return render_template('ajax_cluster_details.html', **context)

@@ -67,7 +67,7 @@ config.py:
 
 Authenication
 -------------
-Per default the creator of all resource is "Anonymous". You can easily setup authentication in front of TCM and pass the username using a HTTP header.
+Per default the creator of all resources is "Anonymous". You can easily setup authentication in front of TCM and pass the username using a HTTP header.
 
 Example
 

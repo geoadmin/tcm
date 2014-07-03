@@ -250,17 +250,11 @@ var showImageDialog = function (instanceId) {
 }
 
 var loadImages = function () {
-
-    $("#images").load("/ajax-image-list", function () {
-        //setTimeout(loadClusterInstances(), 5000);
-    });
+    $("#images").load("/ajax-image-list");
 }
 
 var loadInstances = function () {
-
-    $("#instances").load("/ajax-master-instances", function () {
-        //setTimeout(loadClusterInstances(), 5000);
-    });
+    $("#instances").load("/ajax-master-instances");
 }
 
 var showDeleteDialog = function (stackId) {
@@ -290,6 +284,55 @@ var showDeleteDialog = function (stackId) {
                                 type: BootstrapDialog.TYPE_SUCCESS
                             });
                             loadPage();
+                        },
+                        error: function (result) {
+                            dialogRef.close();
+                            BootstrapDialog.alert({
+                                message: result.responseText,
+                                type: BootstrapDialog.TYPE_DANGER
+                            });
+                        }
+                    });
+                }
+            },
+            {
+                label: 'Close',
+                action: function (dialogRef) {
+                    dialogRef.close();
+                }
+            }
+        ]
+    });
+
+}
+
+var showDeleteImageDialog = function (imageId) {
+
+    BootstrapDialog.show({
+        title: '',
+        message: "Do you really want to delete this image?",
+        buttons: [
+            {
+                icon: 'glyphicon glyphicon-send',
+                label: 'Delete Image',
+                cssClass: 'btn-primary',
+                autospin: true,
+                action: function (dialogRef) {
+                    dialogRef.enableButtons(false);
+                    dialogRef.setClosable(false);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/delete-image",
+                        data: {'image-id': imageId},
+                        cache: false,
+                        success: function (result) {
+                            dialogRef.close();
+                            BootstrapDialog.alert({
+                                message: result,
+                                type: BootstrapDialog.TYPE_SUCCESS
+                            });
+                            loadImages();
                         },
                         error: function (result) {
                             dialogRef.close();

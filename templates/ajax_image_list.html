@@ -8,6 +8,8 @@
                     <th>Description</th>
                     <th>Creator</th>
                     <th>State</th>
+                    <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -18,7 +20,12 @@
                     <td>{{ image.description }}</td>
                     <td>{{ image.tags.creator }}</td>
                     <td>{{ image.state|highlight_with_label }}</td>
-                    <td><button type="button" class="btn btn-default" onClick="showLaunchDialog('{{ image.id }}');">Launch Cluster</button></td>
+                    <td>
+                        <button type="button" class="btn btn-default" onClick="showDeleteImageDialog('{{ image.id }}');">Delete Image</button>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-default" onClick="showLaunchDialog('{{ image.id }}');">Launch Cluster</button>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

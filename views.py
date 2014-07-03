@@ -104,6 +104,17 @@ def create_image():
     return "AMI %s is getting created. It can take a while to show up under images!" % ami.id
 
 
+@app.route('/delete-image', methods=['POST'])
+def delete_image():
+    image_id = request.form['image-id']
+    ec2 = get_aws_connection('ec2')
+    try:
+        ec2.deregister_image(image_id, delete_snapshot=True)
+        return "Image successfully deleted!"
+    except BotoServerError, e:
+        return make_response(e.error_message, 500)
+
+
 @app.route('/edit-cluster', methods=['POST'])
 def edit_cluster():
     conn = get_aws_connection('autoscale')

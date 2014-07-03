@@ -6,6 +6,8 @@
                 <th>Instance</th>
                 <th>Name</th>
                 <th>State</th>
+                <th>Public IP</th>
+                <th>Private IP</th>
                 <th>Action</th>
             </tr>
             </thead>
@@ -15,6 +17,8 @@
                     <td>{{ instance.id }}</td>
                     <td>{{ instance.tags.Name }}</td>
                     <td>{{ instance.state|highlight_with_label }}</td>
+                    <td>{{ instance.ip_address|default('-', true) }}</td>
+                    <td>{{ instance.private_ip_address }}</td>
                     <td>
                         <button type="button" class="btn btn-default" onClick="showImageDialog('{{ instance.id }}');">Create
                             Image

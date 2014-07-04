@@ -94,8 +94,9 @@ config.py:
     USER_HEADER = 'X-Remote-User'
 
 
-AWS resource tags
+Tags
 -----------------
+AWS tags are used to identifiy which instances and images to display. If you want a new master instance, tag it with "tcm=master". All images available in TCM are tagged with "tcm=image".
 
 
 

@@ -44,8 +44,11 @@ def describe_clusters(stack_name_or_id=None):
     autoscale = get_aws_connection('autoscale')
 
     # get a list of active stacks
+    stacks = []
     try:
-        stacks = [stack for stack in cf.describe_stacks(stack_name_or_id=stack_name_or_id) if stack.stack_status not in ('ROLLBACK_COMPLETE')]
+        for stack in cf.describe_stacks(stack_name_or_id=stack_name_or_id):
+            if stack.stack_status not in ('ROLLBACK_COMPLETE') and stack.stack_name.startswith('tcm-'):
+                stacks.append(stack)
     except BotoServerError, e:
         # log
         return None

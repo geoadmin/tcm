@@ -24,7 +24,7 @@ def ajax_cluster_details():
     stack_name = request.form['stack_name']
 
     clusters = describe_clusters(stack_name)
-    if len(clusters) > 0:
+    if clusters and len(clusters) > 0:
         cluster = clusters[0]
 
     instanceInfos = cluster['elb'].get_instance_health()
@@ -148,11 +148,16 @@ def launch_cluster():
 
     template = render_template('template.json')
 
-    stackName =request.form['name']
+    # Prefix stackname
+    stackName = "tcm-%s" % request.form['name']
+
     params = [
         ('InstanceType', request.form['instance-type']),
         ('ImageId', request.form['ami']),
         ('DesiredCapacity', request.form['capacity']),
+        ('AZs', config.AWS_AVAILABILITY_ZONE),
+        ('Subnets', config.AWS_SUBNET),
+        ('SecurityGroups', config.AWS_SECURITY_GROUPS),
     ]
 
     try:

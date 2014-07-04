@@ -10,3 +10,7 @@ SECRET_KEY = 'your-random-string-goes-here'
 # your AWS credentials
 AWS_ACCESS_KEY_ID = ''
 AWS_SECERET_ACCESS_KEY = ''
+
+AWS_AVAILABILITY_ZONE = 'eu-west-1a'
+AWS_SUBNET = 'subnet-123456'
+AWS_SECURITY_GROUPS = 'sg-123456'

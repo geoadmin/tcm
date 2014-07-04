@@ -33,12 +33,16 @@ Use config.py.dist as a base for your own configuration
 ```
 $ cp config.py.dist config.py
 ```
-Add your AWS credentials
+Add your AWS credentials plus the desired availability zone, subnet and security groups for your cluster.
 
 config.py:
 
     AWS_ACCESS_KEY_ID = 'your-access-key'
     AWS_SECERET_ACCESS_KEY = 'your-secret-access-key'
+
+    AWS_AVAILABILITY_ZONE = 'eu-west-1a'
+    AWS_SUBNET = 'subnet-123456'
+    AWS_SECURITY_GROUPS = 'sg-123456'
 
 Start the application
 ```
@@ -94,8 +98,9 @@ config.py:
     USER_HEADER = 'X-Remote-User'
 
 
-AWS resource tags
+Tags
 -----------------
+AWS tags are used to identifiy which instances and images to display. If you want a new master instance, tag it with "tcm=master". All images available in TCM are tagged with "tcm=image".
 
 
 

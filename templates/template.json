@@ -13,7 +13,6 @@
 	"ImageId" : {
    	 "Description" : "AMI to use for that cluster",
      "Type" : "String",
-     "Default" : "ami-57ce0620",
      "ConstraintDescription" : "must be a valid AMI"
  	},
   	"DesiredCapacity" : {
@@ -22,20 +21,32 @@
      "Default" : "2",
      "MinValue" : "1",
      "MaxValue" : "20"
-   	}
+   	},
+    "AZs": {
+        "Type" : "CommaDelimitedList",
+        "Description" : "Availability zone to launch this cluster"
+    },
+    "Subnets" : {
+	    "Type" : "CommaDelimitedList",
+		"Description" : "The list of SubnetIds where the stack will be launched"
+	},
+    "SecurityGroups" : {
+	    "Type" : "CommaDelimitedList",
+		"Description" : "The list of SecurityGroups to associate"
+	}
   },
 
   "Resources" : {
     "WmsCluster" : {
       "Type" : "AWS::AutoScaling::AutoScalingGroup",
       "Properties" : {
-        "AvailabilityZones" : ["eu-west-1a" ],
+        "AvailabilityZones" : { "Ref" : "AZs" },
         "LaunchConfigurationName" : { "Ref" : "LaunchConfig" },
         "DesiredCapacity": { "Ref": "DesiredCapacity" },
         "MinSize" : "1",
-        "MaxSize" : "20",
+        "MaxSize" : "50",
         "LoadBalancerNames" : [ { "Ref" : "ElasticLoadBalancer" } ],
-        "VPCZoneIdentifier": ["subnet-1820cf6f"]
+        "VPCZoneIdentifier" : {"Ref" : "Subnets"}
       }
     },
 
@@ -44,7 +55,7 @@
       "Properties" : {
         "ImageId" : { "Ref" : "ImageId" },
         "InstanceType" : { "Ref" : "InstanceType" },
-        "SecurityGroups" : [ "sg-91d01ff4" ],
+        "SecurityGroups" : {"Ref" : "SecurityGroups"},
         "AssociatePublicIpAddress": false
 
       }

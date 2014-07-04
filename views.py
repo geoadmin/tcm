@@ -155,6 +155,9 @@ def launch_cluster():
         ('InstanceType', request.form['instance-type']),
         ('ImageId', request.form['ami']),
         ('DesiredCapacity', request.form['capacity']),
+        ('AZs', config.AWS_AVAILABILITY_ZONE),
+        ('Subnets', config.AWS_SUBNET),
+        ('SecurityGroups', config.AWS_SECURITY_GROUPS),
     ]
 
     try:

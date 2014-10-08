@@ -10,30 +10,30 @@
       "Default" : "c3.xlarge",
       "ConstraintDescription" : "must be a valid EC2 instance type."
     },
-	"ImageId" : {
-   	 "Description" : "AMI to use for that cluster",
-     "Type" : "String",
-     "ConstraintDescription" : "must be a valid AMI"
- 	},
-  	"DesiredCapacity" : {
-     "Description" : "Number of instances for that cluster",
-     "Type": "Number",
-     "Default" : "2",
-     "MinValue" : "1",
-     "MaxValue" : "20"
-   	},
+    "ImageId" : {
+      "Description" : "AMI to use for that cluster",
+      "Type" : "String",
+      "ConstraintDescription" : "must be a valid AMI"
+    },
+    "DesiredCapacity" : {
+      "Description" : "Number of instances for that cluster",
+      "Type": "Number",
+      "Default" : "2",
+      "MinValue" : "1",
+      "MaxValue" : "20"
+    },
     "AZs": {
-        "Type" : "CommaDelimitedList",
-        "Description" : "Availability zone to launch this cluster"
+      "Type" : "CommaDelimitedList",
+      "Description" : "Availability zone to launch this cluster"
     },
     "Subnets" : {
-	    "Type" : "CommaDelimitedList",
-		"Description" : "The list of SubnetIds where the stack will be launched"
-	},
+      "Type" : "CommaDelimitedList",
+      "Description" : "The list of SubnetIds where the stack will be launched"
+    },
     "SecurityGroups" : {
-	    "Type" : "CommaDelimitedList",
-		"Description" : "The list of SecurityGroups to associate"
-	}
+      "Type" : "CommaDelimitedList",
+      "Description" : "The list of SecurityGroups to associate"
+    }
   },
 
   "Resources" : {
@@ -64,7 +64,7 @@
     "ElasticLoadBalancer" : {
       "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
       "Properties" : {
-        "Subnets": ["subnet-1820cf6f"],
+        "Subnets": {"Ref" : "Subnets"},
         "Listeners" : [ {
           "LoadBalancerPort" : "80",
           "InstancePort" : "80",
